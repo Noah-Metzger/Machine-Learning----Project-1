@@ -1,30 +1,41 @@
 import pandas as pd
+pd.options.mode.chained_assignment = None
 import numpy as np
 import math
 
 class Preprocessor:
     def __init__(self, df):
-        self.df = df
+        """
+        Constructor for Preprocessor class.  All preprocessing logic is applied to the preprocessor object.
 
-    def removesMissingValues(self):
+        :param df: data table
+        """
+        self.df = df
         checkItems = ["?"]
+
+    def removesmissingvalues(self):
+        """
+        Removes each observation that contains a missing value.
+        """
         missingRows = []
         for i, row in self.df.iterrows():
             isMissing = False
             for j, value in row.items():
-                for k in checkItems:
+                for k in self.checkItems:
                     if value == k or value == math.nan:
                         isMissing = True
             if isMissing:
                 missingRows.append(i)
         self.df.drop(missingRows, axis=0, inplace=True)
 
-    def fillMean(self):
-        checkItems = ["?"]
+    def fillmean(self):
+        """
+        Fills each missing value with the mean value of the missing value's attribute.
+        """
         for col in self.df:
             missingIndex = []
             for index, value in self.df[col].items():
-                for k in checkItems:
+                for k in self.checkItems:
                     if value == k or value == math.nan:
                         isMissing = True
             if len(missingIndex) > 0:
@@ -34,29 +45,36 @@ class Preprocessor:
                 for i in missingIndex:
                     self.df[col][i] = mean
 
-    def fillForward(self):
-        checkItems = ["?"]
+    def fillforward(self):
+        """
+        Forward fills all missing values.
+        """
         for col in self.df:
             for index, value in self.df[col].items():
-                for k in checkItems:
+                for k in self.checkItems:
                     if value == k or value == math.nan:
                         if index + 1 >= len(self.df[col]):
                             self.df[col][index] = self.df[col][0]
                         else:
                             self.df[col][index] = self.df[col][index + 1]
 
-    def fillBackward(self):
-        checkItems = ["?"]
+    def fillbackward(self):
+        """
+        Backward fills all missing values.
+        """
         for col in self.df:
             for index, value in self.df[col].items():
-                for k in checkItems:
+                for k in self.checkItems:
                     if value == k or value == math.nan:
                         if index - 1 < 0:
                             self.df[col][index] = self.df[col][len(self.df[col]) - 1]
                         else:
                             self.df[col][index] = self.df[col][index - 1]
 
-    def labelEncode(self):
+    def labelencode(self):
+        """
+        Label encodes all categorical attributes.
+        """
         for col in self.df:
             if type(self.df[col][0]) == str:
                 labels = []
@@ -72,7 +90,10 @@ class Preprocessor:
                         if i == value:
                             self.df[col][index] = labels.index(value)
 
-    def oneHotEncoding(self):
+    def onehotencoding(self):
+        """
+        One hot encodes all categorical attributes
+        """
         for col in self.df:
             if type(self.df[col][0]) == str:
                 labels = []
@@ -90,14 +111,3 @@ class Preprocessor:
                             temp[index] = 1
                     self.df.insert(col, i, temp)
                 self.df.drop(self.df.columns[[col + len(labels)]], axis=1, inplace=True)
-
-def main():
-    breastCancer = pd.read_csv(r"C:\Users\nic\Desktop\CSCI-447\project 1\Machine-Learning----Project-1\Data\breast-cancer-wisconsin.csv", header=None)
-    glass = pd.read_csv('Data/glass.csv', header=None)
-    houseVotes = pd.read_csv('Data/house-votes-84.csv', header=None)
-    iris = pd.read_csv('Data/iris.csv', header=None)
-    soyBean = pd.read_csv('Data/soybean-small.csv', header=None)
-    x = Preprocessor(iris)
-    x.labelEncode()
-
-main()
