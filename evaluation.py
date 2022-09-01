@@ -115,12 +115,14 @@ class Evaluation:
 
         :return: a list of the precision of each category.
         """
-        conmat = self.confusionMatrix(np.array(self.pred), np.array(self.truth), self.label)
+        conmat = self.getconfusionmatrix(np.array(self.pred), np.array(self.truth), self.label)
         TP = self.truePositive(conmat)
         FP = self.falsePositive(conmat)
         prec = []
         for i in range(len(conmat)):
             prec.append((TP[i]) / (TP[i] + FP[i]))
+
+        self.printResults("precision", prec)
         return prec
 
     def recall(self):
@@ -135,10 +137,12 @@ class Evaluation:
         conmat = self.confusionMatrix(np.array(self.pred), np.array(self.truth), self.label)
         TP = self.truePositive(conmat)
         FN = self.falseNegative(conmat)
-        prec = []
+        rec = []
         for i in range(len(conmat)):
-            prec.append((TP[i]) / (TP[i] + FN[i]))
-        return prec
+            rec.append((TP[i]) / (TP[i] + FN[i]))
+
+        self.printResults("recall", rec)
+        return rec
 
     def fscore(self, b):
         """
@@ -156,6 +160,8 @@ class Evaluation:
         for i in range(len(self.label)):
             Fb = (1 + pow(b, 2)) * (prec[i] * rec[i]) / ((pow(b, 2) * prec[i]) + rec[i])
             f.append(Fb)
+
+        self.printResults("f" + str(b) + "-score", f)
         return f
 
     def f1score(self):
@@ -168,6 +174,12 @@ class Evaluation:
         :return: a list of the f1 scores of each category.
         """
         return self.fScore(1)
+
+    def printResults(self, type, results):
+        out = "The " + type + " for: "
+        for i, result in enumerate(results):
+            out += str(self.labels[i]) + " " + str(result) + " "
+        print(out)
 
     def shuffle(self):
         """
