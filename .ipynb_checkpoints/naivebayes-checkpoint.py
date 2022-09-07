@@ -1,0 +1,350 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "52bcc284",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "6641caa9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "data = pd.read_csv(\"C:/Users/Noah Metzger/GitRepo/Machine-Learning----Project-1/Data/breast-cancer-wisconsin.csv\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "16e816c9",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>5</th>\n",
+       "      <th>1</th>\n",
+       "      <th>1.1</th>\n",
+       "      <th>1.2</th>\n",
+       "      <th>2</th>\n",
+       "      <th>1.3</th>\n",
+       "      <th>3</th>\n",
+       "      <th>1.4</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>4</td>\n",
+       "      <td>5</td>\n",
+       "      <td>7</td>\n",
+       "      <td>10</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>3</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>6</td>\n",
+       "      <td>8</td>\n",
+       "      <td>8</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3</td>\n",
+       "      <td>7</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>8</td>\n",
+       "      <td>10</td>\n",
+       "      <td>10</td>\n",
+       "      <td>8</td>\n",
+       "      <td>7</td>\n",
+       "      <td>10</td>\n",
+       "      <td>9</td>\n",
+       "      <td>7</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>693</th>\n",
+       "      <td>3</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>694</th>\n",
+       "      <td>2</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>695</th>\n",
+       "      <td>5</td>\n",
+       "      <td>10</td>\n",
+       "      <td>10</td>\n",
+       "      <td>3</td>\n",
+       "      <td>7</td>\n",
+       "      <td>3</td>\n",
+       "      <td>8</td>\n",
+       "      <td>10</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>696</th>\n",
+       "      <td>4</td>\n",
+       "      <td>8</td>\n",
+       "      <td>6</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3</td>\n",
+       "      <td>4</td>\n",
+       "      <td>10</td>\n",
+       "      <td>6</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>697</th>\n",
+       "      <td>4</td>\n",
+       "      <td>8</td>\n",
+       "      <td>8</td>\n",
+       "      <td>5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>5</td>\n",
+       "      <td>10</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>698 rows × 8 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     5   1  1.1  1.2  2 1.3   3  1.4\n",
+       "0    5   4    4    5  7  10   3    2\n",
+       "1    3   1    1    1  2   2   3    1\n",
+       "2    6   8    8    1  3   4   3    7\n",
+       "3    4   1    1    3  2   1   3    1\n",
+       "4    8  10   10    8  7  10   9    7\n",
+       "..  ..  ..  ...  ... ..  ..  ..  ...\n",
+       "693  3   1    1    1  3   2   1    1\n",
+       "694  2   1    1    1  2   1   1    1\n",
+       "695  5  10   10    3  7   3   8   10\n",
+       "696  4   8    6    4  3   4  10    6\n",
+       "697  4   8    8    5  4   5  10    4\n",
+       "\n",
+       "[698 rows x 8 columns]"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 114,
+   "id": "44d74f20",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "class NaiveBayesClassifier:\n",
+    "    \n",
+    "   \n",
+    "    \n",
+    "        \n",
+    "    def learn(self,data,response):\n",
+    "    \n",
+    "        # meta information of data\n",
+    "        self.num_samples = data.shape[0]\n",
+    "        self.num_features = data.shape[1]\n",
+    "        self.num_classes = np.unique(response)\n",
+    "        \n",
+    "        \n",
+    "        # Probability of each class\n",
+    "        self.cls_dict = {}\n",
+    "        for cls in self.num_classes:\n",
+    "            self.cls_dict.update({cls: np.count_nonzero(response == cls) / self.num_samples})\n",
+    "            \n",
+    "        calc_feature_likelyhood(self,data,response)\n",
+    "        \n",
+    "    def calc_feature_likelyhood    \n",
+    "        \n",
+    "        \n",
+    "        "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "id": "b3d9f673",
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "698\n",
+      "{2: 0.6547277936962751, 4: 0.3452722063037249}\n"
+     ]
+    }
+   ],
+   "source": [
+    "nb = NaiveBayesClassifier()\n",
+    "\n",
+    "data = pd.read_csv(\"C:/Users/Noah Metzger/GitRepo/Machine-Learning----Project-1/Data/breast-cancer-wisconsin.csv\")\n",
+    "\n",
+    "test = pd.DataFrame(data = data)\n",
+    "\n",
+    "nb.learn(test[test.columns[1:9]],test[test.columns[10]])\n",
+    "\n",
+    "num_classes = np.unique(test[test.columns[10]])\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5f66ce7c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "nb = NaiveBayesClassifier()\n",
+    "print(nb.num_samples)\n",
+    "print(nb.num_features)\n",
+    "\n",
+    "nb.learn(test[test.columns[1:9]],test[test.columns[10]])\n",
+    "print(nb.num_samples)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 119,
+   "id": "df8752e5",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "698"
+      ]
+     },
+     "execution_count": 119,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6117bb29",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
