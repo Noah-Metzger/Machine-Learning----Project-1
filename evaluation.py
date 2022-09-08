@@ -180,31 +180,3 @@ class Evaluation:
         for i, result in enumerate(results):
             out += str(self.labels[i]) + " " + str(result) + " "
         print(out)
-
-    def shuffle(self):
-        """
-        Shuffles 10% of the observations in the table to different positions.
-        """
-        randoms = int(self.df.shape[0] * 0.1)
-        indices = []
-        rows = []
-
-        for i in range(randoms):
-            r = random.randint(self.df.shape[0])
-            indices.append(r)
-            rows.append(np.array(self.df.iloc[[r]]))
-
-        self.df.drop(indices, axis=0, inplace=True)
-        self.df = self.df.reset_index(drop=True)
-
-        rest = []
-        for i in range(self.df.shape[0]):
-            rest.append(np.array(self.df.iloc[[i]]))
-
-        for i in rows:
-            r = random.randint(len(rest))
-            rest.insert(r, i)
-        for i in range(len(rest)):
-            rest[i] = rest[i][0]
-
-        self.df = pd.DataFrame(rest)
