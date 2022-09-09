@@ -1,5 +1,6 @@
 from preprocess import *
 from numpy import random
+import matplotlib as plt
 
 class Evaluation:
     def __init__(self, df, pred, truth):
@@ -180,3 +181,12 @@ class Evaluation:
         for i, result in enumerate(results):
             out += str(self.labels[i]) + " " + str(result) + " "
         print(out)
+
+    def plot(self, lossfunc1, lossfunc2, ):
+        result1 = lossfunc1()
+        result2 = lossfunc2()
+        plt.scatter(result1, result2)
+        plt.title("Dataset name")
+        plt.xlabel("lossfunc1")
+        plt.ylabel("lossfunc2")
+        plt.show()
