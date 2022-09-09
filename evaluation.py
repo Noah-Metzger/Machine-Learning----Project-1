@@ -1,5 +1,6 @@
 from preprocess import *
 from numpy import random
+import matplotlib as plt
 
 class Evaluation:
     def __init__(self, df, pred, truth):
@@ -181,30 +182,11 @@ class Evaluation:
             out += str(self.labels[i]) + " " + str(result) + " "
         print(out)
 
-    def shuffle(self):
-        """
-        Shuffles 10% of the observations in the table to different positions.
-        """
-        randoms = int(self.df.shape[0] * 0.1)
-        indices = []
-        rows = []
-
-        for i in range(randoms):
-            r = random.randint(self.df.shape[0])
-            indices.append(r)
-            rows.append(np.array(self.df.iloc[[r]]))
-
-        self.df.drop(indices, axis=0, inplace=True)
-        self.df = self.df.reset_index(drop=True)
-
-        rest = []
-        for i in range(self.df.shape[0]):
-            rest.append(np.array(self.df.iloc[[i]]))
-
-        for i in rows:
-            r = random.randint(len(rest))
-            rest.insert(r, i)
-        for i in range(len(rest)):
-            rest[i] = rest[i][0]
-
-        self.df = pd.DataFrame(rest)
+    def plot(self, lossfunc1, lossfunc2, ):
+        result1 = lossfunc1()
+        result2 = lossfunc2()
+        plt.scatter(result1, result2)
+        plt.title("Dataset name")
+        plt.xlabel("lossfunc1")
+        plt.ylabel("lossfunc2")
+        plt.show()

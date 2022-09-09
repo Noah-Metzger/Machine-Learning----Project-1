@@ -28,6 +28,7 @@ class execute:
                 else:
                     train.append(fold)
             results.append(func(train, test))
+
         return results
 
     def fold(self, n):
