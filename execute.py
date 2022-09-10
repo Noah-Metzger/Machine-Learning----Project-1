@@ -1,4 +1,6 @@
-from preprocess import *
+import pandas as pd
+import numpy as np
+pd.options.mode.chained_assignment = None
 
 class execute:
     def __init__(self, df):
@@ -9,7 +11,7 @@ class execute:
         """
         self.df = df
 
-    def crossvalidate(self, func, n):
+    def crossvalidate(self, func, nFold, truthCol):
         """
         Conducts a n fold cross-validation experiment
 
@@ -17,7 +19,7 @@ class execute:
         :param n: The fold count of the cross-validation
         :return: The results from each fold experiment
         """
-        folds = self.fold(n)
+        folds = self.fold(nFold)
         results = []
         for i in range(len(folds)):
             train = pd.DataFrame()
@@ -26,8 +28,15 @@ class execute:
                 if j == i:
                     test = test.append(fold)
                 else:
-                    train.append(fold)
-            results.append(func(train, test))
+                    train = train.append(fold)
+
+            train_response = train.iloc[:, truthCol]
+            train.drop(truthCol, axis=1, inplace=True)
+
+            test_response = test.iloc[:, truthCol]
+            test.drop(truthCol, axis=1, inplace=True)
+
+            results.append(func(train, train_response, test, test_response))
 
         return results
 
@@ -39,5 +48,4 @@ class execute:
         :return: an numpy array of equally split sections of the data set
         """
         dfc = self.df
-        dfc = dfc.sample(frac=1)
         return np.array_split(dfc, n)

@@ -1,7 +1,7 @@
 import random
+import sys
 
 import pandas as pd
-pd.options.mode.chained_assignment = None
 import numpy as np
 import math
 from sklearn.model_selection import train_test_split
@@ -10,14 +10,17 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report
 
 class Preprocessor:
-    def __init__(self, df):
+    def __init__(self, df, truth, name):
         """
         Constructor for Preprocessor class.  All preprocessing logic is applied to the preprocessor object.
 
         :param df: data table
         """
         self.df = df
-        checkItems = ["?"]
+        self.dfName = name
+        self.truthCol = df.iloc[:, truth]
+        self.truthColIndex = truth
+        self.checkItems = ["?"]
 
     def removesmissingvalues(self):
         """
@@ -118,6 +121,35 @@ class Preprocessor:
                     self.df.insert(col, i, temp)
                 self.df.drop(self.df.columns[[col + len(labels)]], axis=1, inplace=True)
 
+    def binning(self, columns, BIN_NUMBER):
+        """
+        Takes a numerical attribute and converts it into a categorical attribute by taking a specified number of desired categories and splitting them into a "bin" for each category.
+        The separating into bins are based on a sorted list of the values and the list is split equally by order.  Each split section is put into a separate bin
+
+        :param columns: The desired numerical attribute
+        :param BIN_NUMBER: The desired number of "bins" or categories
+        """
+        for col in columns:
+            tempCol = self.df.iloc[:, col]
+            indices = np.array(list(range(0,len(tempCol))))
+            for i in range(len(tempCol)):
+                for j in range(0, len(tempCol) - i - 1):
+                    if tempCol[i] > tempCol[j]:
+                        temp = tempCol[i]
+                        tempCol[i] = tempCol[j]
+                        tempCol[j] = temp
+
+                        tempIndex = indices[i]
+                        indices[i] = indices[j]
+                        indices[j] = tempIndex
+
+            bins = np.array_split(tempCol, BIN_NUMBER)
+            binIndices = np.array_split(indices, BIN_NUMBER)
+            for i, bin in enumerate(binIndices):
+
+                for ind in bin:
+                    self.df.iloc[:, col][ind] = i
+
     def shuffle(self):
         """
         Shuffles 10% of the observations in the table to different positions.
@@ -127,7 +159,7 @@ class Preprocessor:
         rows = []
 
         for i in range(randoms):
-            r = random.randint(self.df.shape[0])
+            r = random.randint(0, self.df.shape[0] - 1)
             indices.append(r)
             rows.append(np.array(self.df.iloc[[r]]))
 
@@ -136,10 +168,10 @@ class Preprocessor:
 
         rest = []
         for i in range(self.df.shape[0]):
-            rest.append(np.array(self.df.iloc[[i]]))
+                rest.append(np.array(self.df.iloc[[i]]))
 
         for i in rows:
-            r = random.randint(len(rest))
+            r = random.randint(0, len(rest))
             rest.insert(r, i)
         for i in range(len(rest)):
             rest[i] = rest[i][0]

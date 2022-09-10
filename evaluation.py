@@ -1,9 +1,10 @@
 from preprocess import *
 from numpy import random
-import matplotlib as plt
+import matplotlib.pyplot as plt
+pd.options.mode.chained_assignment = None
 
 class Evaluation:
-    def __init__(self, df, pred, truth):
+    def __init__(self, pred, truth, whole):
         """
         Constructor for Evaluation class.  All classification evaluation logic is applied to the evaluation object.
 
@@ -11,10 +12,10 @@ class Evaluation:
         :param pred: Predicted classification
         :param truth: Ground truth classification
         """
-        self.df = df
+
         self.pred = pred
         self.truth = truth
-        self.label = self.getlabels(truth)
+        self.label = self.getlabels(whole)
 
     def getlabels(self, col):
         """
@@ -26,15 +27,7 @@ class Evaluation:
         :rtype: list
         """
 
-        labels = []
-        for index, value in col.items():
-            isDup = False
-            for i in labels:
-                if i == value:
-                    isDup = True
-            if not isDup:
-                labels.append(value)
-        return labels
+        return list(np.unique(col))
 
     def getconfusionmatrix(self):
         """
@@ -116,12 +109,15 @@ class Evaluation:
 
         :return: a list of the precision of each category.
         """
-        conmat = self.getconfusionmatrix(np.array(self.pred), np.array(self.truth), self.label)
-        TP = self.truePositive(conmat)
-        FP = self.falsePositive(conmat)
+        conmat = self.getconfusionmatrix()
+        TP = self.truepositive(conmat)
+        FP = self.falsepositive(conmat)
         prec = []
         for i in range(len(conmat)):
-            prec.append((TP[i]) / (TP[i] + FP[i]))
+            if (TP[i] + FP[i]) == 0:
+                prec.append(0)
+            else:
+                prec.append((TP[i]) / (TP[i] + FP[i]))
 
         self.printResults("precision", prec)
         return prec
@@ -131,16 +127,19 @@ class Evaluation:
         Returns the recall values of a classifier
 
         :param pred: Predicted classification from the classifier
-        :param truth: Ground truth classification
+        :param truth: Ground truth classificati on
         :param label: List of possible categories.
         :return: a list of the recall of each category.
         """
-        conmat = self.confusionMatrix(np.array(self.pred), np.array(self.truth), self.label)
-        TP = self.truePositive(conmat)
-        FN = self.falseNegative(conmat)
+        conmat = self.getconfusionmatrix()
+        TP = self.truepositive(conmat)
+        FN = self.falsenegative(conmat)
         rec = []
         for i in range(len(conmat)):
-            rec.append((TP[i]) / (TP[i] + FN[i]))
+            if (TP[i] + FN[i]) == 0:
+                rec.append(0)
+            else:
+                rec.append((TP[i]) / (TP[i] + FN[i]))
 
         self.printResults("recall", rec)
         return rec
@@ -177,16 +176,13 @@ class Evaluation:
         return self.fScore(1)
 
     def printResults(self, type, results):
+        """
+        Called by a loss function method to print out it's results
+
+        :param type: A string of the name of the loss function
+        :param results: A Python List of results of the loss function
+        """
         out = "The " + type + " for: "
         for i, result in enumerate(results):
-            out += str(self.labels[i]) + " " + str(result) + " "
+            out += "Category: " + str(self.label[i]) + " is " + str(result) + " "
         print(out)
-
-    def plot(self, lossfunc1, lossfunc2, ):
-        result1 = lossfunc1()
-        result2 = lossfunc2()
-        plt.scatter(result1, result2)
-        plt.title("Dataset name")
-        plt.xlabel("lossfunc1")
-        plt.ylabel("lossfunc2")
-        plt.show()

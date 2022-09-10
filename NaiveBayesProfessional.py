@@ -1,10 +1,7 @@
 import numpy as np
 import pandas as pd
 
-
-
 class NaiveBayesClassifier:
-    
     def driver(self,training,train_y,test,test_y):
         """
         mini driver to call learn and predict function
@@ -28,7 +25,7 @@ class NaiveBayesClassifier:
         true_class = []
         for i in test_y:
             true_class.append(i)
-        
+
         self.learn(training,train_y)
         
         pred_and_groundTruth.append(self.predict(test))
@@ -160,11 +157,17 @@ class NaiveBayesClassifier:
             split_data.append(pd.DataFrame())
         
         ind_count = 0
+        # print(response)
         for cls in self.num_classes:            # iterates through number of classes and adds individual data points to correct dataframe in split_data
             tmp = []
-            for i,y in response.items():
-                if y == cls: 
-                    tmp.append(data.iloc[i])
+            for i,y in enumerate(response):
+                if y == cls:
+                    # print(i)
+                    try:
+                        tmp.append(data.iloc[i])
+                    except:
+                        # print(data)
+                        continue
                     
             split_data[ind_count] = pd.DataFrame(tmp)
             ind_count +=1
