@@ -19,6 +19,34 @@ class execute:
         :param n: The fold count of the cross-validation
         :return: The results from each fold experiment
         """
+
+        labels = np.unique(df.iloc[:, truthCol])
+        balanceDF = pd.DataFrame()
+
+        plit_data = []
+
+        for x in range(len(self.num_classes)):  # adds n number of DataFrames to split_data
+
+            split_data.append(pd.DataFrame())
+
+        ind_count = 0
+        # print(response)
+        for cls in self.num_classes:  # iterates through number of classes and adds individual data points to correct dataframe in split_data
+            tmp = []
+            for i, y in enumerate(response):
+                if y == cls:
+                    # print(i)
+                    try:
+                        tmp.append(data.iloc[i])
+                    except:
+                        # print(data)
+                        continue
+
+            split_data[ind_count] = pd.DataFrame(tmp)
+            ind_count += 1
+
+        
+
         folds = self.fold(nFold)
         results = []
         for i in range(len(folds)):

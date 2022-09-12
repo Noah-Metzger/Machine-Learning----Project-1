@@ -29,6 +29,15 @@ class Evaluation:
 
         return list(np.unique(col))
 
+    def printConfusionMatrix(self):
+        matrix = self.getconfusionmatrix()
+        print("***Confusion Matrix***")
+        for i in matrix:
+            line = ""
+            for j in i:
+                line += str(j) + " "
+            print(line)
+
     def getconfusionmatrix(self):
         """
         Returns a confusion matrix for the results of a classifier

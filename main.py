@@ -39,6 +39,7 @@ def experiment(preproArr):
             e = Evaluation(fold[0], fold[1], np.array(obj.truthCol))
             prec = e.precision()
             rec = e.recall()
+            e.printConfusionMatrix()
             for i in range(len(prec)):
                 x.append(prec[i])
                 y.append(rec[i])
@@ -59,22 +60,41 @@ if __name__ == '__main__':
     #Each dataset is put into a Preprocessor object before classification
     #A dataset is not preprocessed unless a method has been explicit called on the Preprocessor object.
     #The creation of a preprocessor object does not imply that the dataset has been modified in any way.
+    breastCancerNoPre = Preprocessor(breastCancer, 10, "Breast Cancer Wisconsin")
+    preProcessedArray.append(breastCancerNoPre)
+
     breastCancerPre = Preprocessor(breastCancer, 10, "Breast Cancer Wisconsin")
     breastCancerPre.removesmissingvalues()
+    breastCancerPre.shuffle()
     preProcessedArray.append(breastCancerPre)
 
+    glassNoPre = Preprocessor(glass, 10, "Glass")
+    preProcessedArray.append(glassNoPre)
+
     glassPre = Preprocessor(glass, 10, "Glass")
+    glassPre.shuffle()
     preProcessedArray.append(glassPre)
 
-    houseVotes = Preprocessor(houseVotes,0, "House Votes 84")
+    houseVotesNoPre = Preprocessor(houseVotes,0, "House Votes 84")
+    preProcessedArray.append(houseNoVotes)
+
+    houseVotesPre = Preprocessor(houseVotes, 0, "House Votes 84")
+    houseVotesPre.shuffle()
     preProcessedArray.append(houseVotes)
 
     irisPre = Preprocessor(iris, 4, "Iris")
-    irisPre.shuffle()
     irisPre.binning([0,1,2,3], 5)
+    irisPre.shuffle()
     preProcessedArray.append(irisPre)
 
+    irisNoPre = Preprocessor(iris, 4, "Iris")
+    preProcessedArray.append(irisNoPre)
+
     soyBeanPre = Preprocessor(soyBean, 35, "Soy bean")
+    soyBeanPre.shuffle()
+    preProcessedArray.append(soyBeanPre)
+
+    soyBeanNoPre = Preprocessor(soyBean, 35, "Soy bean")
     preProcessedArray.append(soyBeanPre)
 
     experiment(preProcessedArray)
