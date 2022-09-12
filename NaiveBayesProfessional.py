@@ -162,12 +162,7 @@ class NaiveBayesClassifier:
             tmp = []
             for i,y in enumerate(response):
                 if y == cls:
-                    # print(i)
-                    try:
-                        tmp.append(data.iloc[i])
-                    except:
-                        # print(data)
-                        continue
+                    tmp.append(data.iloc[i])
                     
             split_data[ind_count] = pd.DataFrame(tmp)
             ind_count +=1
