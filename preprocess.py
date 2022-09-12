@@ -124,7 +124,7 @@ class Preprocessor:
     def binning(self, columns, BIN_NUMBER):
         """
         Takes a numerical attribute and converts it into a categorical attribute by taking a specified number of desired categories and splitting them into a "bin" for each category.
-        The separating into bins are based on a sorted list of the values and the list is split equally by order.  Each split section is put into a separate bin
+        The separating into bins are based on a sorted list of the values and the list is split equally by order.  Each split section is put into a separate bin.  Feature is label encoded
 
         :param columns: The desired numerical attribute
         :param BIN_NUMBER: The desired number of "bins" or categories
@@ -152,28 +152,19 @@ class Preprocessor:
 
     def shuffle(self):
         """
-        Shuffles 10% of the observations in the table to different positions.
+        Takes 10% or at least one features if less than 10 features and shuffles values in that feature.  Meant to introduce noise into the dataset.
         """
-        randoms = int(self.df.shape[0] * 0.1)
-        indices = []
-        rows = []
+
+        randoms = int(self.df.shape[1] * 0.1)
+
+        if randoms == 0:
+            randoms = 1
 
         for i in range(randoms):
-            r = random.randint(0, self.df.shape[0] - 1)
-            indices.append(r)
-            rows.append(np.array(self.df.iloc[[r]]))
-
-        self.df.drop(indices, axis=0, inplace=True)
-        self.df = self.df.reset_index(drop=True)
-
-        rest = []
-        for i in range(self.df.shape[0]):
-                rest.append(np.array(self.df.iloc[[i]]))
-
-        for i in rows:
-            r = random.randint(0, len(rest))
-            rest.insert(r, i)
-        for i in range(len(rest)):
-            rest[i] = rest[i][0]
-
-        self.df = pd.DataFrame(rest)
+            r = random.randint(0, self.df.shape[1] - 1)
+            if r == self.truthColIndex:
+                while r != self.truthColIndex:
+                    r = random.randint(0, self.df.shape[1] - 1)
+            feature = np.array(self.df.iloc[:,r])
+            np.random.shuffle(feature)
+            self.df.iloc[:, r] = feature
