@@ -150,6 +150,12 @@ class Preprocessor:
                 for ind in bin:
                     self.df.iloc[:, col][ind] = i
 
+    def deleteFeature(self, index):
+        self.df = self.df.drop([index],axis=1)
+        if self.truthColIndex > index:
+            self.truthColIndex -= 1
+
+
     def shuffle(self):
         """
         Takes 10% or at least one features if less than 10 features and shuffles values in that feature.  Meant to introduce noise into the dataset.
@@ -162,6 +168,7 @@ class Preprocessor:
 
         for i in range(randoms):
             r = random.randint(0, self.df.shape[1] - 1)
+            print(r)
             if r == self.truthColIndex:
                 while r != self.truthColIndex:
                     r = random.randint(0, self.df.shape[1] - 1)

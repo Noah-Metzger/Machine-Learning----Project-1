@@ -20,6 +20,8 @@ class execute:
         :return: The results from each fold experiment
         """
 
+        self.df = self.df.sample(frac=1).reset_index(drop=True)
+
         folds = self.fold(nFold)
         results = []
         for i in range(len(folds)):

@@ -2,6 +2,7 @@ from preprocess import *
 from evaluation import *
 from execute import *
 from NaiveBayesProfessional import *
+import copy
 pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
@@ -64,49 +65,51 @@ if __name__ == '__main__':
     #A dataset is not preprocessed unless a method has been explicit called on the Preprocessor object.
     #The creation of a preprocessor object does not imply that the dataset has been modified in any way.
 
-    breastCancerNoPre = Preprocessor(breastCancer, 10, "Breast Cancer Wisconsin")
-    breastCancerNoPre.removesmissingvalues()
-    preProcessedArray.append(breastCancerNoPre)
+    breastCancerNoNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin")
+    breastCancerNoNoise.deleteFeature(0)
+    breastCancerNoNoise.removesmissingvalues()
+    preProcessedArray.append(breastCancerNoNoise)
 
-    breastCancerPre = Preprocessor(breastCancer, 10, "Breast Cancer Wisconsin - Noise Introduced")
-    breastCancerPre.removesmissingvalues()
-    breastCancerPre.shuffle()
-    preProcessedArray.append(breastCancerPre)
+    breastCancerNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin - Noise Introduced")
+    breastCancerNoise.deleteFeature(0)
+    breastCancerNoise.removesmissingvalues()
+    breastCancerNoise.shuffle()
+    preProcessedArray.append(breastCancerNoise)
 
-    glassNoPre = Preprocessor(glass, 10, "Glass")
-    preProcessedArray.append(glassNoPre)
+    glassNoNoise = Preprocessor(copy.copy(glass), 10, "Glass")
+    glassNoNoise.deleteFeature(0)
+    glassNoNoise.binning(list(range(1, 9)), 7)
+    preProcessedArray.append(glassNoNoise)
+    print(glassNoNoise.df)
 
-    glassPre = Preprocessor(glass, 10, "Glass - Noise Introduced")
-    glassPre.shuffle()
-    preProcessedArray.append(glassPre)
+    glassNoise = Preprocessor(copy.copy(glass), 10, "Glass - Noise Introduced")
+    glassNoise.deleteFeature(0)
+    glassNoise.binning(list(range(1, 9)), 7)
+    glassNoise.shuffle()
+    preProcessedArray.append(glassNoise)
+    print(glassNoise.df)
 
-    houseVotesNoPre = Preprocessor(houseVotes,0, "House Votes 84")
-    preProcessedArray.append(houseVotesNoPre)
+    houseVotesNoNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84")
+    preProcessedArray.append(houseVotesNoNoise)
 
-    houseVotesPre = Preprocessor(houseVotes, 0, "House Votes 84 - Noise Introduced")
-    houseVotesPre.shuffle()
-    preProcessedArray.append(houseVotesPre)
+    houseVotesNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84 - Noise Introduced")
+    houseVotesNoise.shuffle()
+    preProcessedArray.append(houseVotesNoise)
 
-    #HYPER-PARAMETER! (same number of ground truth categories)
-    numberOfBins = 3
+    irisNoNoise = Preprocessor(copy.copy(iris), 4, "Iris")
+    irisNoNoise.binning([0, 1, 2, 3], 3)
+    preProcessedArray.append(irisNoNoise)
 
-    irisPre = Preprocessor(iris, 4, "Iris")
-    irisPre.binning([0, 1, 2, 3], numberOfBins)
-    irisPre.shuffle()
-    preProcessedArray.append(irisPre)
+    irisNoise = Preprocessor(copy.copy(iris), 4, "Iris - Noise Introduced")
+    irisNoise.binning([0, 1, 2, 3], 3)
+    irisNoise.shuffle()
+    preProcessedArray.append(irisNoise)
 
-    irisNoPre = Preprocessor(iris, 4, "Iris - Noise Introduced")
-    irisPre.binning([0, 1, 2, 3], numberOfBins)
-    preProcessedArray.append(irisNoPre)
+    soyBeanNoNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean")
+    preProcessedArray.append(soyBeanNoNoise)
 
-    soyBeanPre = Preprocessor(soyBean, 35, "Soy bean")
-    soyBeanPre.shuffle()
-    preProcessedArray.append(soyBeanPre)
-
-    soyBeanNoPre = Preprocessor(soyBean, 35, "Soy bean - Noise Introduced")
-    preProcessedArray.append(soyBeanPre)
+    soyBeanNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean - Noise Introduced")
+    soyBeanNoise.shuffle()
+    preProcessedArray.append(soyBeanNoise)
 
     experiment(preProcessedArray)
-
-
-
