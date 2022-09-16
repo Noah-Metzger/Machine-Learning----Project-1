@@ -7,12 +7,38 @@ pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
 
-def tune(tuning):
+def tune(prepro, lowerBound, cols):
     """
     Prints the results of average precision and recall values for each bin. Prints out sorted list of values and the number of bins for each corresponding value.
 
-    :param tuning: Python list of average of precison and recall values added together for each cross validated for each set with a different amount of bins.
+    :param prepro: Preprocessor object for dataset for number of bins to be tuned for
+    :param lowerBound: The lower bound of number of bins to test.
+    :param upperBound: The upper bound of number of bins to test.
+    :param cols: Array of column indexes to bin.
     """
+    tuning = []
+    for b in range(len(prepro)):
+        prepro[b].binning(cols, b+lowerBound)
+        # Conducts classification with 10-fold cross-validation
+        n = NaiveBayesClassifier()
+        e = execute(prepro[b].df)
+        results = e.crossvalidate(n.driver, 10, prepro[b].truthColIndex)
+
+        x = []
+        y = []
+        # Prints out precision and recall for each fold
+
+        for fold in results:
+            e = Evaluation(fold[0], fold[1], np.array(prepro[b].truthCol))
+            # prec = e.precision()
+            # rec = e.recall()
+            # e.printConfusionMatrix()
+            for i in range(len(prec)):
+                x.append(prec[i])
+                y.append(rec[i])
+
+        tuning.append((sum(x) / len(x)) + (sum(y) / len(y)))
+
     index = list(range(0,len(tuning)))
 
     for i in range(len(tuning)):
@@ -25,8 +51,12 @@ def tune(tuning):
                 tempIndex = index[i]
                 index[i] = index[j]
                 index[j] = tempIndex
+
+    for i in range(len(index)):
+        index[i] = index[i] + lowerBound
     print(tuning)
     print(index)
+    print(str(index[0]) + " number of bins has the greatest (precison + recall)")
 
 def plot(result1, result2, name):
     """
@@ -41,6 +71,7 @@ def plot(result1, result2, name):
     plt.xlabel("Precision")
     plt.ylabel("Recall")
     plt.show()
+    # plt.savefig(name + ".png")
 
 def experiment(preproArr):
     """
@@ -48,18 +79,17 @@ def experiment(preproArr):
 
     :param preproArr: A Python list of Preprocessor objects.  These do not necessarily need to have any preprocessing methods called before classification
     """
-    # tuning = []
     for obj in preproArr:
         #Conducts classification with 10-fold cross-validation
         n = NaiveBayesClassifier()
         e = execute(obj.df)
         results = e.crossvalidate(n.driver, 10, obj.truthColIndex)
-
         x = []
         y = []
         #Prints out precision and recall for each fold
         print("***" + obj.dfName + "***")
         for fold in results:
+            print(fold[0])
             e = Evaluation(fold[0], fold[1], np.array(obj.truthCol))
             prec = e.precision()
             rec = e.recall()
@@ -72,10 +102,9 @@ def experiment(preproArr):
         print("Average precision: " + str(sum(x) / len(x)))
         print("Average recall: " + str(sum(y) / len(y)))
         print()
-        # tuning.append([(sum(x) / len(x)) + (sum(y) / len(y))])
-    # tune(tuning)
+        plot(np.array(x), np.array(y), obj.dfName)
+
     #Prints scatter plots
-    # plot(np.array(x), np.array(y), obj.dfName)
 
 if __name__ == '__main__':
     preProcessedArray = []
@@ -99,34 +128,39 @@ if __name__ == '__main__':
     # breastCancerNoise.removesmissingvalues()
     # breastCancerNoise.shuffle()
     # preProcessedArray.append(breastCancerNoise)
-
-    glassNoNoise = Preprocessor(copy.copy(glass), 10, "Glass")
-    glassNoNoise.deleteFeature(0)
-    glassNoNoise.binning(list(range(1, 9)), 7)
-    preProcessedArray.append(glassNoNoise)
-
-    glassNoise = Preprocessor(copy.copy(glass), 10, "Glass - Noise Introduced")
-    glassNoise.deleteFeature(0)
-    glassNoise.binning(list(range(1, 9)), 7)
-    glassNoise.shuffle()
-    preProcessedArray.append(glassNoise)
-
+    #
+    # glassNoNoise = Preprocessor(copy.copy(glass), 10, "Glass")
+    # glassNoNoise.deleteFeature(0)
+    # glassNoNoise.binning(list(range(1, 9)), 7)
+    # preProcessedArray.append(glassNoNoise)
+    #
+    # glassNoise = Preprocessor(copy.copy(glass), 10, "Glass - Noise Introduced")
+    # glassNoise.deleteFeature(0)
+    # glassNoise.binning(list(range(1, 9)), 7)
+    # glassNoise.shuffle()
+    # preProcessedArray.append(glassNoise)
+    #
     # houseVotesNoNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84")
     # preProcessedArray.append(houseVotesNoNoise)
     #
     # houseVotesNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84 - Noise Introduced")
     # houseVotesNoise.shuffle()
     # preProcessedArray.append(houseVotesNoise)
-
+    #
     irisNoNoise = Preprocessor(copy.copy(iris), 4, "Iris")
     irisNoNoise.binning([0, 1, 2, 3], 6)
     preProcessedArray.append(irisNoNoise)
+    # arr = []
+    # for i in range(3,10):
+    #     irisTune = Preprocessor(copy.copy(iris), 4, "Iris Tuning")
+    #     arr.append(irisTune)
+    # tune(arr, 3, [0, 1, 2, 3])
 
-    irisNoise = Preprocessor(copy.copy(iris), 4, "Iris - Noise Introduced")
-    irisNoise.binning([0, 1, 2, 3], 6)
-    irisNoise.shuffle()
-    preProcessedArray.append(irisNoise)
-    #
+    # irisNoise = Preprocessor(copy.copy(iris), 4, "Iris - Noise Introduced")
+    # irisNoise.binning([0, 1, 2, 3], 6)
+    # irisNoise.shuffle()
+    # preProcessedArray.append(copy.copy(irisNoise))
+
     # soyBeanNoNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean")
     # preProcessedArray.append(soyBeanNoNoise)
     #

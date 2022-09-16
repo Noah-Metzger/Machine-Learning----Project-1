@@ -58,6 +58,7 @@ class NaiveBayesClassifier:
             self.cls_dict.update({cls: np.count_nonzero(response == cls)})
         
         self.feature_likelyhood = self.calc_feature_likelyhood(data,response)
+        print(self.feature_likelyhood)
         
     def predict(self,data):
         """
@@ -126,13 +127,13 @@ class NaiveBayesClassifier:
                         likelyhood[value] += 1
                     else:
                         likelyhood[value] = 1 
-                
+
+
                 for count in likelyhood.keys(): # Iterates through dictionary keys and divides by num_observations
                     likelyhood[count] = (likelyhood.get(count) + alpha) / (s.shape[0] +alpha * len(self.num_classes))         # laplace smoothing 
                 
                 tmp.append(likelyhood)
             likelyHood_array.append(tmp)
-        
         return likelyHood_array
 
     def calc_lk(self,data,response):

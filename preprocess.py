@@ -166,9 +166,11 @@ class Preprocessor:
         if randoms == 0:
             randoms = 1
 
+        seed = 1234
+        random.seed(seed)
+        np.random.seed(seed)
         for i in range(randoms):
             r = random.randint(0, self.df.shape[1] - 1)
-            print(r)
             if r == self.truthColIndex:
                 while r != self.truthColIndex:
                     r = random.randint(0, self.df.shape[1] - 1)
