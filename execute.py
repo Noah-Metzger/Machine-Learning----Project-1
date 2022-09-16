@@ -20,11 +20,14 @@ class execute:
         :return: The results from each fold experiment
         """
 
+        #Shuffles the order of instances to create a balanced number of each class in each fold
         self.df = self.df.sample(frac=1, random_state=69420).reset_index(drop=True)
 
         folds = self.fold(nFold)
         results = []
+        #Iterates through each fold
         for i in range(len(folds)):
+            #Separates dataset into training and test datasets
             train = pd.DataFrame()
             test = pd.DataFrame()
             for j, fold in enumerate(folds):
@@ -33,6 +36,7 @@ class execute:
                 else:
                     train = train.append(fold)
 
+            #Separates ground truth column from training and test set
             train_response = train.iloc[:, truthCol]
             train.drop(truthCol, axis=1, inplace=True)
 

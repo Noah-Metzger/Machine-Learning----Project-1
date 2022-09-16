@@ -18,6 +18,7 @@ def tune(prepro, lowerBound, cols):
     """
     tuning = []
     for b in range(len(prepro)):
+        #Binning of dataset for each number in the range
         prepro[b].binning(cols, b+lowerBound)
         # Conducts classification with 10-fold cross-validation
         n = NaiveBayesClassifier()
@@ -27,20 +28,20 @@ def tune(prepro, lowerBound, cols):
         x = []
         y = []
         # Prints out precision and recall for each fold
-
         for fold in results:
             e = Evaluation(fold[0], fold[1], np.array(prepro[b].truthCol))
-            # prec = e.precision()
-            # rec = e.recall()
-            # e.printConfusionMatrix()
+            prec = e.precision()
+            rec = e.recall()
             for i in range(len(prec)):
                 x.append(prec[i])
                 y.append(rec[i])
 
         tuning.append((sum(x) / len(x)) + (sum(y) / len(y)))
 
+    #Creating a list of indexes to track the positions of values in tuning array
     index = list(range(0,len(tuning)))
 
+    #Bubble sorts values in tuning array, when values are swapped in tuning array, the same indices are swapped index array to keep track of values position.
     for i in range(len(tuning)):
         for j in range(0, len(tuning) - i - 1):
             if tuning[i] > tuning[j]:
@@ -52,8 +53,10 @@ def tune(prepro, lowerBound, cols):
                 index[i] = index[j]
                 index[j] = tempIndex
 
+    #Adds the lower bound of range of number of bins to check to accurately print number of bins with corresponding preformance.
     for i in range(len(index)):
         index[i] = index[i] + lowerBound
+    #Prints out tuning results
     print(tuning)
     print(index)
     print(str(index[0]) + " number of bins has the greatest (precison + recall)")
@@ -118,54 +121,75 @@ if __name__ == '__main__':
     #A dataset is not preprocessed unless a method has been explicit called on the Preprocessor object.
     #The creation of a preprocessor object does not imply that the dataset has been modified in any way.
 
-    # breastCancerNoNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin")
-    # breastCancerNoNoise.deleteFeature(0)
-    # breastCancerNoNoise.removesmissingvalues()
-    # preProcessedArray.append(breastCancerNoNoise)
-    #
-    # breastCancerNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin - Noise Introduced")
-    # breastCancerNoise.deleteFeature(0)
-    # breastCancerNoise.removesmissingvalues()
-    # breastCancerNoise.shuffle()
-    # preProcessedArray.append(breastCancerNoise)
-    #
-    # glassNoNoise = Preprocessor(copy.copy(glass), 10, "Glass")
-    # glassNoNoise.deleteFeature(0)
-    # glassNoNoise.binning(list(range(1, 9)), 7)
-    # preProcessedArray.append(glassNoNoise)
-    #
-    # glassNoise = Preprocessor(copy.copy(glass), 10, "Glass - Noise Introduced")
-    # glassNoise.deleteFeature(0)
-    # glassNoise.binning(list(range(1, 9)), 7)
-    # glassNoise.shuffle()
-    # preProcessedArray.append(glassNoise)
-    #
-    # houseVotesNoNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84")
-    # preProcessedArray.append(houseVotesNoNoise)
-    #
-    # houseVotesNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84 - Noise Introduced")
-    # houseVotesNoise.shuffle()
-    # preProcessedArray.append(houseVotesNoise)
-    #
+    #Breast Cancer dataset without noise
+    breastCancerNoNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin")
+    breastCancerNoNoise.deleteFeature(0)
+    breastCancerNoNoise.removesmissingvalues()
+    preProcessedArray.append(breastCancerNoNoise)
+
+    # Breast Cancer dataset with noise
+    breastCancerNoise = Preprocessor(copy.copy(breastCancer), 10, "Breast Cancer Wisconsin - Noise Introduced")
+    breastCancerNoise.deleteFeature(0)
+    breastCancerNoise.removesmissingvalues()
+    breastCancerNoise.shuffle()
+    preProcessedArray.append(breastCancerNoise)
+
+    #Tuning hyper-parameter for number of bins for glass dataset
+    arr1 = []
+    for i in range(7,22):
+        glassTune = Preprocessor(copy.copy(glass), 10, "Glass Tuning")
+        glassTune.deleteFeature(0)
+        arr1.append(glassTune)
+    tune(arr1, 3, list(range(1, 9)))
+
+    #Glass dataset without noise
+    glassNoNoise = Preprocessor(copy.copy(glass), 10, "Glass")
+    glassNoNoise.deleteFeature(0)
+    glassNoNoise.binning(list(range(1, 9)), 7)
+    preProcessedArray.append(glassNoNoise)
+
+    #Glass dataset with noise
+    glassNoise = Preprocessor(copy.copy(glass), 10, "Glass - Noise Introduced")
+    glassNoise.deleteFeature(0)
+    glassNoise.binning(list(range(1, 9)), 7)
+    glassNoise.shuffle()
+    preProcessedArray.append(glassNoise)
+
+    #House votes dataset without noise
+    houseVotesNoNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84")
+    preProcessedArray.append(houseVotesNoNoise)
+
+    #House votes dataset with noise
+    houseVotesNoise = Preprocessor(copy.copy(houseVotes), 0, "House Votes 84 - Noise Introduced")
+    houseVotesNoise.shuffle()
+    preProcessedArray.append(houseVotesNoise)
+
+    #Tuning hyper-parameter for number of bins for Iris dataset
+    arr = []
+    for i in range(3,10):
+        irisTune = Preprocessor(copy.copy(iris), 4, "Iris Tuning")
+        arr.append(irisTune)
+    tune(arr, 3, [0, 1, 2, 3])
+
+    #Iris dataset without noise
     irisNoNoise = Preprocessor(copy.copy(iris), 4, "Iris")
     irisNoNoise.binning([0, 1, 2, 3], 6)
     preProcessedArray.append(irisNoNoise)
-    # arr = []
-    # for i in range(3,10):
-    #     irisTune = Preprocessor(copy.copy(iris), 4, "Iris Tuning")
-    #     arr.append(irisTune)
-    # tune(arr, 3, [0, 1, 2, 3])
 
-    # irisNoise = Preprocessor(copy.copy(iris), 4, "Iris - Noise Introduced")
-    # irisNoise.binning([0, 1, 2, 3], 6)
-    # irisNoise.shuffle()
-    # preProcessedArray.append(copy.copy(irisNoise))
+    #Iris dataset with noise
+    irisNoise = Preprocessor(copy.copy(iris), 4, "Iris - Noise Introduced")
+    irisNoise.binning([0, 1, 2, 3], 6)
+    irisNoise.shuffle()
+    preProcessedArray.append(copy.copy(irisNoise))
 
-    # soyBeanNoNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean")
-    # preProcessedArray.append(soyBeanNoNoise)
-    #
-    # soyBeanNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean - Noise Introduced")
-    # soyBeanNoise.shuffle()
-    # preProcessedArray.append(soyBeanNoise)
+    #Soy bean dataset without noise
+    soyBeanNoNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean")
+    preProcessedArray.append(soyBeanNoNoise)
 
+    #Soy bean dataset with noise
+    soyBeanNoise = Preprocessor(copy.copy(soyBean), 35, "Soy bean - Noise Introduced")
+    soyBeanNoise.shuffle()
+    preProcessedArray.append(soyBeanNoise)
+
+    #Passes array of all 10 different datasets to run experiment
     experiment(preProcessedArray)
